@@ -1,17 +1,20 @@
 package domain
 
 type IPeopleGoUp interface {
-	SavePeopleGoUp(cantidad int32) error
+	SavePeopleGoUp(esp32ID string, cantidad int32) error
 	GetAll() ([]PeopleGoUp, error)
 }
 
 type PeopleGoUp struct {
 	ID          int32 `json:"id"`
+	Esp32ID     string `json:"esp32_id"`
 	Cantidad	int32 `json:"cantidad"`
 }
 
-func NewPeopleGoUp(cantidad int32) *PeopleGoUp {
-	return &PeopleGoUp{ Cantidad: cantidad}
+func NewPeopleGoUp(esp32ID string ,cantidad int32) *PeopleGoUp {
+	return &PeopleGoUp{
+		Esp32ID: esp32ID, 
+		Cantidad: cantidad}
 }
 
 func (t *PeopleGoUp) SetCantidad(cantidad int32) {

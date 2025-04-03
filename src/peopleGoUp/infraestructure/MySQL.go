@@ -21,9 +21,9 @@ func NewMySQL() domain.IPeopleGoUp {
 	return &MySQL{conn: conn}
 }
 
-func (mysql *MySQL) SavePeopleGoUp(cantidad int32) error {
-	query := "INSERT INTO transit (cantidad) VALUES (?)"
-	result, err := mysql.conn.ExecutePreparedQuery(query, cantidad)
+func (mysql *MySQL) SavePeopleGoUp(esp32_id string ,cantidad int32) error {
+	query := "INSERT INTO goup (esp32_id, cantidad) VALUES (?, ?)"
+	result, err := mysql.conn.ExecutePreparedQuery(query, esp32_id ,cantidad)
 	if err != nil {
 		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
 	}
@@ -38,7 +38,7 @@ func (mysql *MySQL) SavePeopleGoUp(cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-    query := "SELECT id, cantidad FROM transit"
+    query := "SELECT id, esp32_id ,cantidad FROM goup"
     rows, err := mysql.conn.FetchRows(query)
     if err != nil {
         return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)

@@ -13,14 +13,14 @@ func NewCreatepeopleGoUp(r domain.IPeopleGoUpRabbitqm, db domain.IPeopleGoUp) *C
 	return &CreatepeopleGoUp{rabbit: r, db: db}
 }
 
-func (ct *CreatepeopleGoUp) Execute(cantidad int32) error {
+func (ct *CreatepeopleGoUp) Execute(esp32_id string ,cantidad int32) error {
 	
-	err := ct.db.SavePeopleGoUp(cantidad)
+	err := ct.db.SavePeopleGoUp(esp32_id ,cantidad)
 	if err != nil {
 		return err
 	}
 
-	peopleGoUp := domain.NewPeopleGoUp(cantidad)
+	peopleGoUp := domain.NewPeopleGoUp(esp32_id, cantidad)
 
 	err = ct.rabbit.Save(peopleGoUp)
 	if err != nil {

@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
-	"log"
 	"apiMulti/src/config"
 	"apiMulti/src/config/middleware"
-	userInfra "apiMulti/src/users/infraestructure"
 	"apiMulti/src/movement/infraestructure"
-
+	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
+	userInfra "apiMulti/src/users/infraestructure"
+	"log"
 )
 
 func main() {
@@ -18,6 +18,7 @@ func main() {
 
 	mysqlRepo := infraestructure.NewMySQL()
 	userRepo := userInfra.NewMySQL()
+	goupRepo := goupInfra.NewMySQL()
 
 	rabbitMQRepo, err := config.GetChannel()
 	if err != nil {
@@ -34,6 +35,13 @@ func main() {
 
 	userRouter := userInfra.SetupRouter(userRepo)
 	for _, route := range userRouter.Routes() {
+		r.Handle(route.Method, route.Path, route.HandlerFunc)
+	}
+
+	goupRabbitRepo := goupInfra.NewRabbitRepository(rabbitMQRepo.Ch)
+
+	goupRouter := goupInfra.SetupRouter(goupRepo, goupRabbitRepo)
+	for _, route := range goupRouter.Routes() {
 		r.Handle(route.Method, route.Path, route.HandlerFunc)
 	}
 
