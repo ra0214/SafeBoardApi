@@ -17,7 +17,7 @@ func NewCreatePeopleGoUpController(useCase *application.CreatepeopleGoUp) *Creat
 
 type RequestBody struct {
 	Esp32ID string `json:"esp32_id"`
-	Cantidad int32 `json:"cantidad"`
+	Conteo int32 `json:"conteo"`
 }
 
 func (ct_c *CreatePeopleGoUpController) Execute(c *gin.Context) {
@@ -27,7 +27,7 @@ func (ct_c *CreatePeopleGoUpController) Execute(c *gin.Context) {
 		return
 	}
 
-	err := ct_c.useCase.Execute(body.Esp32ID ,body.Cantidad)
+	err := ct_c.useCase.Execute(body.Esp32ID ,body.Conteo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al guardar el transito de personas", "detalles": err.Error()})
 		return

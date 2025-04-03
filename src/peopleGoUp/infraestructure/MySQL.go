@@ -22,7 +22,7 @@ func NewMySQL() domain.IPeopleGoUp {
 }
 
 func (mysql *MySQL) SavePeopleGoUp(esp32_id string ,cantidad int32) error {
-	query := "INSERT INTO goup (esp32_id, cantidad) VALUES (?, ?)"
+	query := "INSERT INTO goup (esp32_id, conteo) VALUES (?, ?)"
 	result, err := mysql.conn.ExecutePreparedQuery(query, esp32_id ,cantidad)
 	if err != nil {
 		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
@@ -38,7 +38,7 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string ,cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-    query := "SELECT id, esp32_id ,cantidad FROM goup"
+    query := "SELECT id, esp32_id ,conteo FROM goup"
     rows, err := mysql.conn.FetchRows(query)
     if err != nil {
         return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
@@ -49,7 +49,7 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 
     for rows.Next() {
         var peopleGoUp domain.PeopleGoUp
-        if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Cantidad); err != nil {
+        if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Conteo); err != nil {
             return nil, fmt.Errorf("Error al escanear la fila: %v", err)
         }
         peopleGoUpp = append(peopleGoUpp, peopleGoUp)

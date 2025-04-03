@@ -8,15 +8,16 @@ type IPeopleGoUp interface {
 type PeopleGoUp struct {
 	ID          int32 `json:"id"`
 	Esp32ID     string `json:"esp32_id"`
-	Cantidad	int32 `json:"cantidad"`
+	Conteo	int32 `json:"conteo"`
 }
 
-func NewPeopleGoUp(esp32ID string ,cantidad int32) *PeopleGoUp {
+func NewPeopleGoUp(esp32ID string ,conteo int32) *PeopleGoUp {
 	return &PeopleGoUp{
 		Esp32ID: esp32ID, 
-		Cantidad: cantidad}
+		Conteo: conteo,
+	}
 }
 
-func (t *PeopleGoUp) SetCantidad(cantidad int32) {
-	t.Cantidad = cantidad
+func (t *PeopleGoUp) SetCantidad(conteo int32) {
+	t.Conteo = conteo
 }
