@@ -21,16 +21,16 @@ func NewMySQL() domain.IPeopleGoUp {
 	return &MySQL{conn: conn}
 }
 
-func (mysql *MySQL) SavePeopleGoUp(esp32_id string ,cantidad int32) error {
+func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 	query := "INSERT INTO goup (esp32_id, conteo) VALUES (?, ?)"
-	result, err := mysql.conn.ExecutePreparedQuery(query, esp32_id ,cantidad)
+	result, err := mysql.conn.ExecutePreparedQuery(query, esp32_id, cantidad)
 	if err != nil {
 		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 1 {
-		log.Printf("[MySQL] - Conteo de personas guardado correctamente: Cantidad:%s ", cantidad)
+		log.Printf("[MySQL] - Conteo de personas guardado correctamente: Esp32ID:%s Cantidad:%s ", esp32_id, cantidad)
 	} else {
 		log.Println("[MySQL] - No se insertó ninguna fila")
 	}
@@ -38,25 +38,32 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string ,cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-    query := "SELECT id, esp32_id ,conteo FROM goup"
-    rows, err := mysql.conn.FetchRows(query)
-    if err != nil {
-        return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
-    }
-    defer rows.Close()
+	query := "SELECT id, esp32_id, conteo FROM goup"
+	log.Printf("[MySQL] Ejecutando query: %s", query)
 
-    var peopleGoUpp []domain.PeopleGoUp
+	rows, err := mysql.conn.FetchRows(query)
+	if err != nil {
+		log.Printf("[MySQL] Error en FetchRows: %v", err)
+		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
+	}
+	defer rows.Close()
 
-    for rows.Next() {
-        var peopleGoUp domain.PeopleGoUp
-        if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Conteo); err != nil {
-            return nil, fmt.Errorf("Error al escanear la fila: %v", err)
-        }
-        peopleGoUpp = append(peopleGoUpp, peopleGoUp)
-    }
+	var peopleGoUpp []domain.PeopleGoUp
 
-    if err := rows.Err(); err != nil {
-        return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
-    }
-    return peopleGoUpp, nil
+	for rows.Next() {
+		var peopleGoUp domain.PeopleGoUp
+		if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
+			log.Printf("[MySQL] Error al escanear fila: %v", err)
+			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
+		}
+		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("[MySQL] Error al iterar filas: %v", err)
+		return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
+	}
+
+	log.Printf("[MySQL] Registros encontrados: %d", len(peopleGoUpp))
+	return peopleGoUpp, nil
 }

@@ -7,6 +7,7 @@ import (
 	"apiMulti/src/config/middleware"
 	"apiMulti/src/movement/infraestructure"
 	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
+	godownInfra "apiMulti/src/peopleGoDown/infraestructure"
 	userInfra "apiMulti/src/users/infraestructure"
 	"log"
 )
@@ -19,6 +20,7 @@ func main() {
 	mysqlRepo := infraestructure.NewMySQL()
 	userRepo := userInfra.NewMySQL()
 	goupRepo := goupInfra.NewMySQL()
+	godownRepo := godownInfra.NewMySQL()
 
 	rabbitMQRepo, err := config.GetChannel()
 	if err != nil {
@@ -42,6 +44,13 @@ func main() {
 
 	goupRouter := goupInfra.SetupRouter(goupRepo, goupRabbitRepo)
 	for _, route := range goupRouter.Routes() {
+		r.Handle(route.Method, route.Path, route.HandlerFunc)
+	}
+
+	godownRabbitRepo := godownInfra.NewRabbitRepository(rabbitMQRepo.Ch)
+
+	godownRouter := godownInfra.SetupRouter(godownRepo, godownRabbitRepo)
+	for _, route := range godownRouter.Routes() {
 		r.Handle(route.Method, route.Path, route.HandlerFunc)
 	}
 

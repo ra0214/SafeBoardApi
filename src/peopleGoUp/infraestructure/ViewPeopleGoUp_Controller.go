@@ -2,6 +2,7 @@ package infraestructure
 
 import (
 	"apiMulti/src/peopleGoUp/application"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,12 +16,15 @@ func NewViewPeopleGoUpController(useCase *application.ViewPeopleGoUp) *ViewPeopl
 	return &ViewPeopleGoUpController{useCase: useCase}
 }
 
-func (et_c *ViewPeopleGoUpController) Execute(c *gin.Context) {
-	citas, err := et_c.useCase.Execute()
+func (vc *ViewPeopleGoUpController) Execute(c *gin.Context) {
+	data, err := vc.useCase.Execute()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("Error en ViewPeopleGoUpController: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"details": "Error al obtener los datos",
+		})
 		return
 	}
-
-	c.JSON(http.StatusOK, citas)
+	c.JSON(http.StatusOK, data)
 }
