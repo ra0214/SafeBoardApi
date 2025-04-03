@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func InitTransit() error {
+func InitMovement() error {
 	log.Println("Inicializando datos...")
 
 	db, err := config.GetDBConnection()

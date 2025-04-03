@@ -7,7 +7,7 @@ import (
 	"apiMulti/src/config"
 	"apiMulti/src/config/middleware"
 	userInfra "apiMulti/src/users/infraestructure"
-	"apiMulti/src/transit/infraestructure"
+	"apiMulti/src/movement/infraestructure"
 
 )
 

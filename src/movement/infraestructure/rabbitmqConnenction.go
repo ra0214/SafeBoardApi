@@ -8,7 +8,7 @@ import (
     "time"
 
     amqp "github.com/rabbitmq/amqp091-go"
-    "apiMulti/src/transit/domain"
+    "apiMulti/src/movement/domain"
 )
 
 type MyExchangeLogs struct {
@@ -31,7 +31,7 @@ func NewRabbitRepository(ch *amqp.Channel) *MyExchangeLogs {
     return &MyExchangeLogs{ch: ch}
 }
 
-func (ch *MyExchangeLogs) Save(order *domain.Transit) error {
+func (ch *MyExchangeLogs) Save(order *domain.Movement) error {
     body, err := json.Marshal(order)
     if err != nil {
         return fmt.Errorf("error al guardar el producto: %v", err)
