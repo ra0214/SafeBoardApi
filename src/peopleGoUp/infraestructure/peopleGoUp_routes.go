@@ -3,6 +3,7 @@ package infraestructure
 import (
 	"apiMulti/src/peopleGoUp/application"
 	"apiMulti/src/peopleGoUp/domain"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +17,7 @@ func SetupRouter(repo domain.IPeopleGoUp, rabbitRepo domain.IPeopleGoUpRabbitqm)
 	viewPeopleGoUpController := NewViewPeopleGoUpController(viewPeopleGoUp)
 
 	r.POST("/peopleGoUp", createPeopleGoUpController.Execute)
-	r.GET("/peopleGoUp", viewPeopleGoUpController.Execute)
+	r.GET("/peopleGoUpTest", viewPeopleGoUpController.Execute)
 
 	return r
 }
