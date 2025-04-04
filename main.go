@@ -28,9 +28,10 @@ func main() {
 		c.Next()
 	})
 
-	mysqlRepo := infraestructure.NewMySQL()
+	// Inicializar repositorios
 	userRepo := userInfra.NewMySQL()
 	goupRepo := goupInfra.NewMySQL()
+	mysqlRepo := infraestructure.NewMySQL()
 	godownRepo := godownInfra.NewMySQL()
 
 	rabbitMQRepo, err := config.GetChannel()
