@@ -39,11 +39,8 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 	query := "SELECT id, esp32_id, conteo FROM goup"
-	log.Printf("[MySQL] Ejecutando query: %s", query)
-
 	rows, err := mysql.conn.FetchRows(query)
 	if err != nil {
-		log.Printf("[MySQL] Error en FetchRows: %v", err)
 		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
 	}
 	defer rows.Close()
@@ -53,17 +50,13 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 	for rows.Next() {
 		var peopleGoUp domain.PeopleGoUp
 		if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
-			log.Printf("[MySQL] Error al escanear fila: %v", err)
 			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
 		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Printf("[MySQL] Error al iterar filas: %v", err)
 		return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
 	}
-
-	log.Printf("[MySQL] Registros encontrados: %d", len(peopleGoUpp))
 	return peopleGoUpp, nil
 }
