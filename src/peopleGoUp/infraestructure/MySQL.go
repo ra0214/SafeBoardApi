@@ -38,40 +38,32 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-	// Simplificamos la consulta para depuración
 	query := "SELECT id, esp32_id, conteo FROM goup"
-	log.Printf("[MySQL] Query: %s", query)
+	log.Printf("[MySQL] Ejecutando query: %s", query)
 
 	rows, err := mysql.conn.FetchRows(query)
 	if err != nil {
-		log.Printf("[MySQL] Error FetchRows: %v", err)
-		return nil, err
+		log.Printf("[MySQL] Error en FetchRows: %v", err)
+		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
 	}
 	defer rows.Close()
 
 	var peopleGoUpp []domain.PeopleGoUp
 
-	// Debug: Imprimir columnas
-	cols, _ := rows.Columns()
-	log.Printf("[MySQL] Columnas: %v", cols)
-
 	for rows.Next() {
-		var p domain.PeopleGoUp
-
-		// Crear slice de interfaces para el escaneo
-		values := make([]interface{}, 3)
-		values[0] = &p.ID
-		values[1] = &p.Esp32ID
-		values[2] = &p.Conteo
-
-		if err := rows.Scan(values...); err != nil {
-			log.Printf("[MySQL] Error Scan: %v", err)
-			return nil, err
+		var peopleGoUp domain.PeopleGoUp
+		if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
+			log.Printf("[MySQL] Error al escanear fila: %v", err)
+			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
-
-		log.Printf("[MySQL] Datos escaneados: %+v", p)
-		peopleGoUpp = append(peopleGoUpp, p)
+		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
 	}
 
+	if err := rows.Err(); err != nil {
+		log.Printf("[MySQL] Error al iterar filas: %v", err)
+		return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
+	}
+
+	log.Printf("[MySQL] Registros encontrados: %d", len(peopleGoUpp))
 	return peopleGoUpp, nil
 }
