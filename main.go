@@ -25,7 +25,7 @@ func main() {
 			c.AbortWithStatus(204)
 			return
 		}
-		c.Next()
+		c.Next()	
 	})
 
 	// Inicializar repositorios MySQL
