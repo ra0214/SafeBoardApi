@@ -14,7 +14,7 @@ type User struct {
 	UserName string `json:"userName"`
 	Email    string `json:"email"`
 	Password string `json:"password,omitempty"`
-	ESP32ID  string `json:"esp32_id"` // Agregamos el campo para ESP32
+	ESP32ID  string `json:"esp32_id"`
 }
 
 func NewUser(userName string, email string, password string, esp32ID string) *User {

@@ -56,6 +56,7 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 			log.Printf("[MySQL] Error al escanear fila: %v", err)
 			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
+		// Agregar el registro al slice
 		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
 	}
 
