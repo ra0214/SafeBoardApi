@@ -2,40 +2,36 @@ package infraestructure
 
 import (
 	"apiMulti/src/peopleGoDown/application"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CreatePeopleGoDownController struct {
-	createPeopleGoDown *application.CreatePeopleGoDown
+	useCase *application.CreatePeopleGoDown
 }
 
 func NewCreatePeopleGoDownController(useCase *application.CreatePeopleGoDown) *CreatePeopleGoDownController {
-	return &CreatePeopleGoDownController{
-		createPeopleGoDown: useCase,
-	}
+	return &CreatePeopleGoDownController{useCase: useCase}
 }
 
-func (cc *CreatePeopleGoDownController) Execute(c *gin.Context) {
-	var request struct {
-		ESP32ID  string `json:"esp32_id"`
-		Cantidad int32  `json:"conteo"`
-	}
+type RequestBody struct {
+	Esp32ID string `json:"esp32_id"`
+	Conteo  int32  `json:"conteo"`
+}
 
-	if err := c.BindJSON(&request); err != nil {
-		log.Printf("[Controller] Error al parsear request: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func (ct_c *CreatePeopleGoDownController) Execute(c *gin.Context) {
+	var body RequestBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error al leer el JSON", "detalles": err.Error()})
 		return
 	}
 
-	err := cc.createPeopleGoDown.Execute(request.ESP32ID, request.Cantidad)
+	err := ct_c.useCase.Execute(body.Esp32ID, body.Conteo)
 	if err != nil {
-		log.Printf("[Controller] Error en Execute: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al guardar el conteo de personas", "detalles": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Registro creado exitosamente"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Cuenta de personas agregada correctamente"})
 }

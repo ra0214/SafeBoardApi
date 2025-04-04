@@ -60,6 +60,10 @@ func main() {
 	}
 
 	godownRabbitRepo := godownInfra.NewRabbitRepository(rabbitMQRepo.Ch)
+	godownRouter := godownInfra.SetupRouter(godownRepo, godownRabbitRepo)
+	for _, route := range godownRouter.Routes() {
+		r.Handle(route.Method, route.Path, route.HandlerFunc)
+	}
 
 	// Crear los casos de uso
 	createPeopleGoDown := application.NewCreatePeopleGoDown(godownRabbitRepo, godownRepo)
