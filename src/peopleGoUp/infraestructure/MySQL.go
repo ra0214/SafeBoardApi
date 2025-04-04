@@ -44,7 +44,7 @@ func (mysql *MySQL) SavePeopleGoUp(esp32ID string, cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-	query := "SELECT id, esp32_id, conteo FROM goup"
+	query := "SELECT id, esp32_id, aceleracion FROM movement"
 	rows, err := mysql.conn.FetchRows(query)
 	if err != nil {
 		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
