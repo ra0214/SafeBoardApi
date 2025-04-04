@@ -38,7 +38,7 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-	query := "SELECT id, esp32_id, conteo FROM goup"
+	query := "SELECT id, esp32_id, conteo FROM goup ORDER BY id DESC"
 	log.Printf("[MySQL] Ejecutando query: %s", query)
 
 	rows, err := mysql.conn.FetchRows(query)
@@ -52,11 +52,20 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 
 	for rows.Next() {
 		var peopleGoUp domain.PeopleGoUp
-		if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
+		var esp32ID string
+		var conteo int32
+
+		if err := rows.Scan(&peopleGoUp.ID, &esp32ID, &conteo); err != nil {
 			log.Printf("[MySQL] Error al escanear fila: %v", err)
 			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
-		// Agregar el registro al slice
+
+		peopleGoUp.Esp32ID = esp32ID
+		peopleGoUp.Conteo = conteo
+
+		log.Printf("[MySQL] Fila escaneada: ID=%d, Esp32ID='%s', Conteo=%d",
+			peopleGoUp.ID, peopleGoUp.Esp32ID, peopleGoUp.Conteo)
+
 		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
 	}
 
@@ -65,6 +74,6 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 		return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
 	}
 
-	log.Printf("[MySQL] Registros encontrados: %d", len(peopleGoUpp))
+	log.Printf("[MySQL] Total de registros encontrados: %d", len(peopleGoUpp))
 	return peopleGoUpp, nil
 }
