@@ -9,7 +9,7 @@ import (
 	godownInfra "apiMulti/src/peopleGoDown/infraestructure"
 	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
 	userInfra "apiMulti/src/users/infraestructure"
-	"apiMulti/src/websocket"
+	"apiMulti/src/config/websocket"
 	"log"
 )
 
