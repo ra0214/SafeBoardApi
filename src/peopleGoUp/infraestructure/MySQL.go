@@ -49,7 +49,7 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 
 	for rows.Next() {
 		var peopleGoUp domain.PeopleGoUp
-		if err := rows.Scan(&peopleGoUp.ID, &peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
+		if err := rows.Scan(&peopleGoUp.Esp32ID, &peopleGoUp.Conteo); err != nil {
 			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
 		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
