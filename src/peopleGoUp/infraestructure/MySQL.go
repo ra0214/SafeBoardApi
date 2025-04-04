@@ -50,28 +50,36 @@ func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
 
 	var peopleGoUpp []domain.PeopleGoUp
 
+	// Primero verificamos las columnas
+	columns, err := rows.Columns()
+	if err != nil {
+		log.Printf("[MySQL] Error obteniendo columnas: %v", err)
+		return nil, fmt.Errorf("Error obteniendo columnas: %v", err)
+	}
+	log.Printf("[MySQL] Columnas encontradas: %v", columns)
+
 	for rows.Next() {
-		var peopleGoUp domain.PeopleGoUp
+		var p domain.PeopleGoUp
+		// Usamos variables temporales para asegurarnos que los tipos coincidan
+		var id int32
 		var esp32ID string
 		var conteo int32
 
-		if err := rows.Scan(&peopleGoUp.ID, &esp32ID, &conteo); err != nil {
+		// Escaneamos directamente a las variables temporales
+		if err := rows.Scan(&id, &esp32ID, &conteo); err != nil {
 			log.Printf("[MySQL] Error al escanear fila: %v", err)
 			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
 		}
 
-		peopleGoUp.Esp32ID = esp32ID
-		peopleGoUp.Conteo = conteo
+		// Asignamos los valores manualmente
+		p.ID = id
+		p.Esp32ID = esp32ID
+		p.Conteo = conteo
 
-		log.Printf("[MySQL] Fila escaneada: ID=%d, Esp32ID='%s', Conteo=%d",
-			peopleGoUp.ID, peopleGoUp.Esp32ID, peopleGoUp.Conteo)
+		log.Printf("[MySQL] Registro escaneado: ID=%d, Esp32ID='%s', Conteo=%d",
+			p.ID, p.Esp32ID, p.Conteo)
 
-		peopleGoUpp = append(peopleGoUpp, peopleGoUp)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Printf("[MySQL] Error al iterar filas: %v", err)
-		return nil, fmt.Errorf("Error iterando sobre las filas: %v", err)
+		peopleGoUpp = append(peopleGoUpp, p)
 	}
 
 	log.Printf("[MySQL] Total de registros encontrados: %d", len(peopleGoUpp))
