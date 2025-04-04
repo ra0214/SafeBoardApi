@@ -19,6 +19,7 @@ type RequestBody struct {
 	UserName	string `json:"userName"`
 	Email 		string `json:"email"`
 	Password	string `json:"password"`
+	Esp32ID		string `json:"esp32ID"`
 }
 
 func (cu_c *CreateUserController) Execute(c *gin.Context) {
@@ -28,7 +29,7 @@ func (cu_c *CreateUserController) Execute(c *gin.Context) {
 		return
 	}
 
-	err := cu_c.useCase.Execute(body.UserName, body.Email, body.Password)
+	err := cu_c.useCase.Execute(body.UserName, body.Email, body.Password, body.Esp32ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al agregar el usuario", "detalles": err.Error()})
 		return
