@@ -14,7 +14,6 @@ func NewCreateMovement(r domain.IMovementRabbitqm, db domain.IMovement) *CreateM
 }
 
 func (ct *CreateMovement) Execute(esp32_id string, aceleracion float64) error {
-	// Guardar el movimiento en la base de datos
 	err := ct.db.SaveMovement(esp32_id, aceleracion)
 	if err != nil {
 		return err

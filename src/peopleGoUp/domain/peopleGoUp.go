@@ -11,7 +11,7 @@ type PeopleGoUp struct {
 	Conteo	int32 `json:"conteo"`
 }
 
-func NewPeopleGoUp(esp32ID string ,conteo int32) *PeopleGoUp {
+func NewPeopleGoUp(esp32ID string, conteo int32) *PeopleGoUp {
 	return &PeopleGoUp{
 		Esp32ID: esp32ID, 
 		Conteo: conteo,

@@ -14,7 +14,6 @@ func NewCreatepeopleGoUp(r domain.IPeopleGoUpRabbitqm, db domain.IPeopleGoUp) *C
 }
 
 func (ct *CreatepeopleGoUp) Execute(esp32_id string ,conteo int32) error {
-	
 	err := ct.db.SavePeopleGoUp(esp32_id, conteo)
 	if err != nil {
 		return err

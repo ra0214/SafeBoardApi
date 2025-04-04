@@ -22,7 +22,7 @@ func NewMySQL() domain.IUser {
 }
 
 func (mysql *MySQL) SaveUser(userName string, email string, password string, esp32ID string) error {
-	query := "INSERT INTO users (userName, email, password, esp32_id) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO user (userName, email, password, esp32_id) VALUES (?, ?, ?, ?)"
 	result, err := mysql.conn.ExecutePreparedQuery(query, userName, email, password, esp32ID)
 	if err != nil {
 		return fmt.Errorf("error al ejecutar la consulta: %v", err)
@@ -38,7 +38,7 @@ func (mysql *MySQL) SaveUser(userName string, email string, password string, esp
 }
 
 func (mysql *MySQL) GetAll() ([]domain.User, error) {
-	query := "SELECT id, userName, email, password, esp32_id FROM users"
+	query := "SELECT id, userName, email, password, esp32_id FROM user"
 	rows, err := mysql.conn.FetchRows(query)
 	if err != nil {
 		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
@@ -62,7 +62,7 @@ func (mysql *MySQL) GetAll() ([]domain.User, error) {
 }
 
 func (mysql *MySQL) UpdateUser(id int32, userName string, email string, password string, esp32ID string) error {
-	query := "UPDATE users SET userName = ?, email = ?, password = ?, esp32_id = ? WHERE id = ?"
+	query := "UPDATE user SET userName = ?, email = ?, password = ?, esp32_id = ? WHERE id = ?"
 	result, err := mysql.conn.ExecutePreparedQuery(query, userName, email, password, esp32ID, id)
 	if err != nil {
 		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
@@ -78,7 +78,7 @@ func (mysql *MySQL) UpdateUser(id int32, userName string, email string, password
 }
 
 func (mysql *MySQL) DeleteUser(id int32) error {
-	query := "DELETE FROM users WHERE id = ?"
+	query := "DELETE FROM user WHERE id = ?"
 	result, err := mysql.conn.ExecutePreparedQuery(query, id)
 	if err != nil {
 		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
@@ -94,7 +94,7 @@ func (mysql *MySQL) DeleteUser(id int32) error {
 }
 
 func (mysql *MySQL) GetUserByCredentials(userName string) (*domain.User, error) {
-	query := "SELECT id, userName, email, password, esp32_id FROM users WHERE userName = ?"
+	query := "SELECT id, userName, email, password, esp32_id FROM user WHERE userName = ?"
 	row, err := mysql.conn.FetchRow(query, userName)
 	if err != nil {
 		return nil, fmt.Errorf("error al ejecutar la consulta: %v", err)
@@ -110,7 +110,7 @@ func (mysql *MySQL) GetUserByCredentials(userName string) (*domain.User, error) 
 }
 
 func (mysql *MySQL) GetUserByESP32ID(esp32ID string) (*domain.User, error) {
-	query := "SELECT id, userName, email, password, esp32_id FROM users WHERE esp32_id = ?"
+	query := "SELECT id, userName, email, password, esp32_id FROM user WHERE esp32_id = ?"
 	row, err := mysql.conn.FetchRow(query, esp32ID)
 	if err != nil {
 		return nil, fmt.Errorf("error al ejecutar la consulta: %v", err)
