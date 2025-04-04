@@ -9,6 +9,7 @@ import (
 	godownInfra "apiMulti/src/peopleGoDown/infraestructure"
 	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
 	userInfra "apiMulti/src/users/infraestructure"
+	"apiMulti/src/websocket"
 	"log"
 )
 
@@ -76,6 +77,9 @@ func main() {
 	// Registrar las rutas
 	r.POST("/peopleGoDown", createPeopleGoDownController.Execute)
 	r.GET("/peopleGoDown", viewPeopleGoDownController.Execute)
+
+	// Agregar ruta WebSocket
+	r.GET("/ws", websocket.HandleWebSocket)
 
 	r.SetTrustedProxies([]string{"127.0.0.1"})
 
