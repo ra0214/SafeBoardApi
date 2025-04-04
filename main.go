@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"apiMulti/src/config"
-	"apiMulti/src/config/middleware"
 	"apiMulti/src/movement/infraestructure"
-	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
+	"apiMulti/src/peopleGoDown/application"
 	godownInfra "apiMulti/src/peopleGoDown/infraestructure"
+	goupInfra "apiMulti/src/peopleGoUp/infraestructure"
 	userInfra "apiMulti/src/users/infraestructure"
 	"log"
 )
@@ -15,7 +15,18 @@ import (
 func main() {
 	r := gin.Default()
 
-	r.Use(middleware.NewCorsMiddleware())
+	// Configuración CORS global
+	r.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
 
 	mysqlRepo := infraestructure.NewMySQL()
 	userRepo := userInfra.NewMySQL()
@@ -49,10 +60,17 @@ func main() {
 
 	godownRabbitRepo := godownInfra.NewRabbitRepository(rabbitMQRepo.Ch)
 
-	godownRouter := godownInfra.SetupRouter(godownRepo, godownRabbitRepo)
-	for _, route := range godownRouter.Routes() {
-		r.Handle(route.Method, route.Path, route.HandlerFunc)
-	}
+	// Crear los casos de uso
+	createPeopleGoDown := application.NewCreatePeopleGoDown(godownRabbitRepo, godownRepo)
+	viewPeopleGoDown := application.NewViewPeopleGoDown(godownRepo)
+
+	// Crear los controladores
+	createPeopleGoDownController := godownInfra.NewCreatePeopleGoDownController(createPeopleGoDown)
+	viewPeopleGoDownController := godownInfra.NewViewPeopleGoDownController(viewPeopleGoDown)
+
+	// Registrar las rutas
+	r.POST("/peopleGoDown", createPeopleGoDownController.Execute)
+	r.GET("/peopleGoDown", viewPeopleGoDownController.Execute)
 
 	r.SetTrustedProxies([]string{"127.0.0.1"})
 
