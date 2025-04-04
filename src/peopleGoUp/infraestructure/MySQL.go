@@ -38,50 +38,40 @@ func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 }
 
 func (mysql *MySQL) GetAll() ([]domain.PeopleGoUp, error) {
-	query := "SELECT id, esp32_id, conteo FROM goup ORDER BY id DESC"
-	log.Printf("[MySQL] Ejecutando query: %s", query)
+	// Simplificamos la consulta para depuración
+	query := "SELECT id, esp32_id, conteo FROM goup"
+	log.Printf("[MySQL] Query: %s", query)
 
 	rows, err := mysql.conn.FetchRows(query)
 	if err != nil {
-		log.Printf("[MySQL] Error en FetchRows: %v", err)
-		return nil, fmt.Errorf("Error al ejecutar la consulta SELECT: %v", err)
+		log.Printf("[MySQL] Error FetchRows: %v", err)
+		return nil, err
 	}
 	defer rows.Close()
 
 	var peopleGoUpp []domain.PeopleGoUp
 
-	// Primero verificamos las columnas
-	columns, err := rows.Columns()
-	if err != nil {
-		log.Printf("[MySQL] Error obteniendo columnas: %v", err)
-		return nil, fmt.Errorf("Error obteniendo columnas: %v", err)
-	}
-	log.Printf("[MySQL] Columnas encontradas: %v", columns)
+	// Debug: Imprimir columnas
+	cols, _ := rows.Columns()
+	log.Printf("[MySQL] Columnas: %v", cols)
 
 	for rows.Next() {
 		var p domain.PeopleGoUp
-		// Usamos variables temporales para asegurarnos que los tipos coincidan
-		var id int32
-		var esp32ID string
-		var conteo int32
 
-		// Escaneamos directamente a las variables temporales
-		if err := rows.Scan(&id, &esp32ID, &conteo); err != nil {
-			log.Printf("[MySQL] Error al escanear fila: %v", err)
-			return nil, fmt.Errorf("Error al escanear la fila: %v", err)
+		// Crear slice de interfaces para el escaneo
+		values := make([]interface{}, 3)
+		values[0] = &p.ID
+		values[1] = &p.Esp32ID
+		values[2] = &p.Conteo
+
+		if err := rows.Scan(values...); err != nil {
+			log.Printf("[MySQL] Error Scan: %v", err)
+			return nil, err
 		}
 
-		// Asignamos los valores manualmente
-		p.ID = id
-		p.Esp32ID = esp32ID
-		p.Conteo = conteo
-
-		log.Printf("[MySQL] Registro escaneado: ID=%d, Esp32ID='%s', Conteo=%d",
-			p.ID, p.Esp32ID, p.Conteo)
-
+		log.Printf("[MySQL] Datos escaneados: %+v", p)
 		peopleGoUpp = append(peopleGoUpp, p)
 	}
 
-	log.Printf("[MySQL] Total de registros encontrados: %d", len(peopleGoUpp))
 	return peopleGoUpp, nil
 }
