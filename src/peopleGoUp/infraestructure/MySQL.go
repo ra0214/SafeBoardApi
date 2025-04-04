@@ -13,7 +13,6 @@ type MySQL struct {
 
 var _ domain.IPeopleGoUp = (*MySQL)(nil)
 
-// Constructor de la conexión a MySQL
 func NewMySQL() domain.IPeopleGoUp {
 	conn := config.GetDBPool()
 	if conn.Err != "" {
@@ -22,21 +21,16 @@ func NewMySQL() domain.IPeopleGoUp {
 	return &MySQL{conn: conn}
 }
 
-// Guardar el conteo de personas en la base de datos
-func (mysql *MySQL) SavePeopleGoUp(esp32ID string, cantidad int32) error {
+func (mysql *MySQL) SavePeopleGoUp(esp32_id string, cantidad int32) error {
 	query := "INSERT INTO goup (esp32_id, conteo) VALUES (?, ?)"
-	result, err := mysql.conn.ExecutePreparedQuery(query, esp32ID, cantidad)
+	result, err := mysql.conn.ExecutePreparedQuery(query, esp32_id, cantidad)
 	if err != nil {
-		return fmt.Errorf("error al ejecutar la consulta: %v", err)
+		return fmt.Errorf("Error al ejecutar la consulta: %v", err)
 	}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("error al obtener las filas afectadas: %v", err)
-	}
-
+	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 1 {
-		log.Printf("[MySQL] - Conteo de personas guardado correctamente: Esp32ID:%s Cantidad:%d", esp32ID, cantidad)
+		log.Printf("[MySQL] - Conteo de personas guardado correctamente: Esp32ID:%s Cantidad:%s ", esp32_id, cantidad)
 	} else {
 		log.Println("[MySQL] - No se insertó ninguna fila")
 	}
