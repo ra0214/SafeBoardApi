@@ -5,13 +5,13 @@ import (
 )
 
 type ViewPeopleGoDown struct {
-	db domain.IPeopleGoDown
+	repo domain.IPeopleGoDown
 }
 
-func NewViewPeopleGoDown(db domain.IPeopleGoDown) *ViewPeopleGoDown {
-	return &ViewPeopleGoDown{db: db}
+func NewViewPeopleGoDown(repo domain.IPeopleGoDown) *ViewPeopleGoDown {
+	return &ViewPeopleGoDown{repo: repo}
 }
 
-func (vt *ViewPeopleGoDown) Execute() ([]domain.PeopleGoDown, error) {
-	return vt.db.GetAll()
+func (vu *ViewPeopleGoDown) Execute() ([]domain.PeopleGoDown, error) {
+	return vu.repo.GetAll()
 }

@@ -1,20 +1,20 @@
 package domain
 
 type IPeopleGoDown interface {
-	SavePeopleGoDown(esp32ID string, cantidad int32) error
+	SavePeopleGoDown(esp32_id string, cantidad int32) error
 	GetAll() ([]PeopleGoDown, error)
 }
 
 type PeopleGoDown struct {
-	ID          int32 `json:"id"`
-	Esp32ID     string `json:"esp32_id"`
-	Conteo	int32 `json:"conteo"`
+	ID      int32  `json:"id"`
+	ESP32ID string `json:"esp32_id"`
+	Conteo  int32  `json:"conteo"`
 }
 
-func NewPeopleGoDown(esp32ID string ,conteo int32) *PeopleGoDown {
+func NewPeopleGoDown(esp32ID string, conteo int32) *PeopleGoDown {
 	return &PeopleGoDown{
-		Esp32ID: esp32ID, 
-		Conteo: conteo,
+		ESP32ID: esp32ID,
+		Conteo:  conteo,
 	}
 }
 
