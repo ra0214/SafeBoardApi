@@ -1,4 +1,3 @@
-// filepath: c:\Users\Asus\Downloads\Rabbitmq\Rabbitmq\src\config\middleware\middleware.go
 package middleware
 
 import "github.com/gin-gonic/gin"

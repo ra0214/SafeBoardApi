@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -8,19 +9,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type Message struct {
+	Type       string      `json:"type"`
+	Data       interface{} `json:"data"`
+	TargetUser string      `json:"targetUser"` // Este campo determina a qué ESP32 va dirigido
+}
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		return true // Permite todas las conexiones en desarrollo
+		return true
 	},
 }
 
-var clients = make(map[*websocket.Conn]bool)
+var clients = make(map[*websocket.Conn]string) // Mapa de conexiones a ESP32 IDs
 var broadcast = make(chan Message)
-
-type Message struct {
-	Type string      `json:"type"`
-	Data interface{} `json:"data"`
-}
 
 func HandleWebSocket(c *gin.Context) {
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -30,21 +32,48 @@ func HandleWebSocket(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	clients[ws] = true
+	// Esperar el mensaje de registro con el ESP32 ID
+	_, msgBytes, err := ws.ReadMessage()
+	if err != nil {
+		log.Printf("Error al leer mensaje inicial: %v", err)
+		return
+	}
 
+	var initMsg struct {
+		Type     string `json:"type"`
+		ID_ESP32 string `json:"id_esp32"`
+	}
+
+	if err := json.Unmarshal(msgBytes, &initMsg); err != nil {
+		log.Printf("Error parseando mensaje inicial: %v", err)
+		return
+	}
+
+	if initMsg.Type != "register" || initMsg.ID_ESP32 == "" {
+		log.Println("Registro inválido: se esperaba mensaje de tipo 'register' con ID_ESP32")
+		return
+	}
+
+	// Registrar el cliente con su ESP32 ID
+	clients[ws] = initMsg.ID_ESP32
+	log.Printf("Cliente registrado con ID_ESP32: %s", initMsg.ID_ESP32)
+
+	// Mantener la conexión abierta
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
+			log.Printf("Cliente desconectado: %v", initMsg.ID_ESP32)
 			delete(clients, ws)
 			break
 		}
 	}
 }
 
-func BroadcastMessage(messageType string, data interface{}) {
+func BroadcastMessage(messageType string, data interface{}, targetUser string) {
 	message := Message{
-		Type: messageType,
-		Data: data,
+		Type:       messageType,
+		Data:       data,
+		TargetUser: targetUser,
 	}
 	broadcast <- message
 }
@@ -56,7 +85,12 @@ func init() {
 func handleMessages() {
 	for {
 		msg := <-broadcast
-		for client := range clients {
+		for client, clientID := range clients {
+			// Si el mensaje tiene un TargetUser, solo enviarlo a ese cliente
+			if msg.TargetUser != "" && msg.TargetUser != clientID {
+				continue
+			}
+			
 			err := client.WriteJSON(msg)
 			if err != nil {
 				log.Printf("Error al enviar mensaje: %v", err)
