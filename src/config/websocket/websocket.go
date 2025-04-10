@@ -41,7 +41,7 @@ func HandleWebSocket(c *gin.Context) {
 
 	var initMsg struct {
 		Type     string `json:"type"`
-		ID_ESP32 string `json:"id_esp32"`
+		ESP32ID string `json:"esp32_id"`
 	}
 
 	if err := json.Unmarshal(msgBytes, &initMsg); err != nil {
@@ -49,20 +49,20 @@ func HandleWebSocket(c *gin.Context) {
 		return
 	}
 
-	if initMsg.Type != "register" || initMsg.ID_ESP32 == "" {
+	if initMsg.Type != "register" || initMsg.ESP32ID == "" {
 		log.Println("Registro inválido: se esperaba mensaje de tipo 'register' con ID_ESP32")
 		return
 	}
 
 	// Registrar el cliente con su ESP32 ID
-	clients[ws] = initMsg.ID_ESP32
-	log.Printf("Cliente registrado con ID_ESP32: %s", initMsg.ID_ESP32)
+	clients[ws] = initMsg.ESP32ID
+	log.Printf("Cliente registrado con ID_ESP32: %s", initMsg.ESP32ID)
 
 	// Mantener la conexión abierta
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
-			log.Printf("Cliente desconectado: %v", initMsg.ID_ESP32)
+			log.Printf("Cliente desconectado: %v", initMsg.ESP32ID)
 			delete(clients, ws)
 			break
 		}
